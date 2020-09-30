@@ -1,0 +1,5 @@
+#container {
+  display: flex; /* displays flex-items (children) inline */
+  direction:rtl;/* just for presentation, this would be on html element */
+  flex-direction: row-reverse;
+}

@@ -1,0 +1,41 @@
+{% extends 'quran/base.html' %}
+{% block surats_active %}active{% endblock %}
+
+{% block body %}
+<div class="surats-container container-fluid" >
+
+    <!-- surats -->
+    <div class="row ">
+        <div class="col-sm-12">
+            <h3>كل السور</h3>
+        </div>
+        {% if object_list %}
+            {% for surat in object_list %}
+                <div class="col-sm-4 col-lg-2 float-right">
+                    <div class="thumbnail">
+                        <a href="{% url 'quran:detail' surat.id %}">
+                            <img src="{{ surat.surat_logo.url }}" class="img-responsive">
+                        </a>
+                        <div class="caption">
+                            <h2>{{ surat.sorat_name }}</h2>
+                            <h4>{{ surat.sid }}</h4>
+
+                            <!-- View Details -->
+                            <a href="{% url 'quran:detail' surat.id %}" class="btn btn-primary btn-sm" role="button">عرض تفاصيل الايات</a>
+
+
+                        </div>
+                    </div>
+                </div>
+                {% cycle '' '' '' '' '' '<div class="clearfix visible-lg"></div>' %}
+            {% endfor %}
+        {% else %}
+
+        {% endif %}
+    </div>
+
+    <!-- If user searches and there are verses -->
+
+
+</div>
+{% endblock %}

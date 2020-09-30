@@ -1,0 +1,79 @@
+{% extends 'quran/base.html' %}
+{% block title %}{{ sorat }}{% endblock %}
+{% block sorats_active %}active{% endblock %}
+{% block body %}
+
+
+<div class="container-fluid verses-container">
+
+    <div class="row">
+
+                <!-- Left Search Info -->
+        <div class="col-sm-4 col-md-3">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    {% if Search_statistics %}
+                        <p><strong>{{ Search_statistics }}</strong></p>
+                    {% endif %}
+                    {% if words_statistics %}
+                    {% for word in words_statistics %}
+                        <p><strong>{{word}}</strong></p>
+                    {% endfor %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Right verse search Info -->
+        <div class="col-sm-8 col-md-9">
+
+            <div class="panel panel-default">
+                <div class="panel-body">
+
+                    <h3 class="text-center">تفاصيل ايات البحث </h3>
+
+                    {% if error_message %}
+                        <p  class=text-center><strong>{{ error_message }}</strong></p>
+                    {% else %}
+
+
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th>الرقم التسلسلي</th>
+                            <th>رقم الاية</th>
+                            <th class="text-center">نص الاية</th>
+                            <th>عدد الكلمات</th>
+                            <th>الكلمات المحتوية على البحث</th>
+                            <th> مجموع حساب الجمل للآية</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for verse in object_list %}
+                            <tr>
+                                <td>{{ verse.v_g_id }}</td>
+                                <td>{{ verse.v_lid }}</td>
+                                <td>
+                                    <p class="text-center"><strong>{{ verse.v_text }}</strong></p>
+                                </td>
+                                <td> {{ verse.v_words_count }}</td>
+
+                                 <td> {{ verse.v_w_max_rpt }}</td>
+                                <td> {{ verse.v_joumla_sum }}</td>
+
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                     {% endif %}
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
