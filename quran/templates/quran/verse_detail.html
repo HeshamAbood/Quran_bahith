@@ -6,73 +6,73 @@
 
 <div class="container-fluid verses-container">
 
-    <div class="row">
+	<div class="row">
 
-      <div class="text-center col-sm-2 col-md-1">
-            <div class="panel panel-default">
-                <div class="panel-body">
-                    {% if Search_statistics %}
-                        <p><strong>{{ Search_statistics }}</strong></p>
-                    {% endif %}
-                    {% if words_statistics %}
-                        {% for word in words_statistics %}
-                            <p><strong>{{word}}</strong></p>
-                        {% endfor %}
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-        <!-- Right verse Info -->
-        <div class="col-sm-10 col-md-11">
+		<div class="text-center col-sm-2 col-md-1">
+			<div class="panel panel-default">
+				<div class="panel-body">
+					{% if Search_statistics %}
+					<p><strong>{{ Search_statistics }}</strong></p>
+					{% endif %}
+					{% if words_statistics %}
+					{% for word in words_statistics %}
+					<p><strong>{{word}}</strong></p>
+					{% endfor %}
+					{% endif %}
+				</div>
+			</div>
+		</div>
+		<!-- Right verse Info -->
+		<div class="col-sm-10 col-md-11">
 
-            <div class="panel panel-default">
-                <div class="panel-body">
+			<div class="panel panel-default">
+				<div class="panel-body">
 
-                    <h3 class="text-center">تفاصيل ايات البحث </h3>
+					<h3 class="text-center">تفاصيل ايات البحث </h3>
 
-                    {% if error_message %}
-                        <p  class=text-center><strong>{{ error_message }}</strong></p>
-                    {% else %}
-                    <div class="col-sm-6 col-md-7">
-                    <table class="table">
-                        <thead>
-                        <tr>
-                            <th>الرقم التسلسلي</th>
-                            <th>رقم الاية</th>
-                            <th class="col-sm-4 col-md-5">نص الاية</th>
-                            <th>عدد الكلمات</th>
-                            <th>تكرار الحروف</th>
-                            <th> مجموع حساب الجمل</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {% for verse in object_list %}
-                            <tr>
-                                <td>{{ verse.v_g_id }}</td>
-                                <td>{{ verse.v_lid }}</td>
-                                <td>
-                                    <p class="text-center ">{{ verse.v_text }}</p>
-                                </td>
-                                <td> {{ verse.v_words_count }}</td>
-                                <td>{% autoescape off %}
-                                    {{ verse.chars_count_d }}
-                                    {% endautoescape %}
-                                </td>
-                                <td> {{ verse.v_joumla_sum }}</td>
+					{% if error_message %}
+					<p  class=text-center><strong>{{ error_message }}</strong></p>
+					{% else %}
+					<div class=" table-responsive">
+						<table class="table">
+							<thead>
+								<tr>
+									<th>الرقم التسلسلي</th>
+									<th>رقم الاية</th>
+									<th class="col-sm-4 col-md-5">نص الاية</th>
+									<th>عدد الكلمات</th>
+									<th>تكرار الحروف</th>
+									<th> مجموع حساب الجمل</th>
+								</tr>
+							</thead>
+							<tbody>
+								{% for verse in object_list %}
+								<tr>
+									<td>{{ verse.v_g_id }}</td>
+									<td>{{ verse.v_lid }}</td>
+									<td>
+										<p class="text-center ">{{ verse.v_text }}</p>
+									</td>
+									<td><div class="table-responsive"> {{ verse.v_words_count }} </div></td>
+									<td>{% autoescape off %}
+										{{ verse.chars_count_d }}
+										{% endautoescape %}
+									</td>
+									<td> {{ verse.v_joumla_sum }}</td>
 
-                            </tr>
-                        {% endfor %}
-                        </tbody>
-                    </table>
-                         </div>
-                    {% endif %}
+								</tr>
+								{% endfor %}
+							</tbody>
+						</table>
+					</div>
+					{% endif %}
 
-                </div>
-            </div>
+				</div>
+			</div>
 
-        </div>
+		</div>
 
-    </div>
+	</div>
 
 </div>
 

@@ -10,6 +10,10 @@ class SoratView(generic.ListView):
     def get_queryset(self):
 #        self.load_all_sorat()
 #        self.fix_count()
+#        s=Sorat.objects.get(sid=5)
+#        for sl in s.verse_set.all() :
+#            sl.v_lid=int(sl.v_lid)-10
+#            sl.save()
         return Sorat.objects.all()
 
     def fix_count(self):
@@ -19,6 +23,7 @@ class SoratView(generic.ListView):
 #                print(verse.chars_count)
                 verse.init_counts()
                 verse.save()
+
 
     def load_all_sorat(self):
         try:

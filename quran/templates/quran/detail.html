@@ -8,39 +8,24 @@
 
     <div class="row">
 
-        <!-- Left sorat Info -->
-        <div class="col-sm-4 col-md-3">
-            <div class="panel panel-default">
-                <div class="panel-body">
-                    <a href="{% url 'quran:detail' sorat.id %}">
-                        {% if sorat.sorat_logo %}
-                            <img src="{{ sorat.sorat_logo.url }}" class="img-responsive">
-                        {% else %}
-                            <h3>التفاصيل ل</h3>
-                        {% endif %}
-                    </a>
-                    <h1>{{ sorat.sid }} <small> رقم السورة </small></h1>
-                    <h2>{{ sorat.sorat_name }}</h2>
-                </div>
-            </div>
-        </div>
+
 
         <!-- Right verse Info -->
-        <div class="col-sm-8 col-md-9">
+        <div >
 
-            <ul class="nav nav-pills" style="margin-bottom: 10px;">
-                <li role="presentation" class="active"><a href="{% url 'quran:detail' sorat.id %}">View All</a></li>
-            </ul>
 
-            <div class="panel panel-default">
+
+            <div class="panel panel-default col-sm-12 col-md-12">
                 <div class="panel-body">
+                    <h2>{{ sorat.sorat_name }}  <small> رقم السورة </small> {{ sorat.sid }}</h2>
 
-                    <h3>تفاصيل ايات السورة</h3>
+
+                    <h3 class="text-center">تفاصيل ايات السورة</h3>
 
                     {% if error_message %}
                         <p><strong>{{ error_message }}</strong></p>
                     {% endif %}
-
+                    <div class=" table-responsive">
                     <table class="table">
                         <thead>
                         <tr>
@@ -71,7 +56,7 @@
                         {% endfor %}
                         </tbody>
                     </table>
-
+                    </div>
                 </div>
             </div>
 
