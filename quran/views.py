@@ -156,15 +156,56 @@ class QuranSearcheView(generic.CreateView):
 
 
     def get_context_data(self, **kwargs):
-        query = self.request.GET.get("w")
-        query = str(query).strip()
-        # Call the base implementation first to get a context
         context = super().get_context_data(**kwargs)
-        # Add in a QuerySet of all the books
-        print("query:", query)
-        t1 = [vr.v_d_text.split(" ") for vr in self.get_queryset()]
-        result = []
-        result1 = []
+        if (self.request.GET.get("f")):
+            query = self.request.GET.get("f")
+            # Call the base implementation first to get a context
+            # Add in a QuerySet of all the books
+            print("query:", query)
+            s_from = 1
+            s_to = 6236
+            if self.request.GET.get("sorat") and self.request.GET.get("sorat") != "---------":
+                s = self.request.GET.get("sorat")
+                if self.request.GET.get("verse") and self.request.GET.get("verse") != "---------":
+                    vf = int(self.request.GET.get("verse"))
+                    s_from = (Verse.objects.get(v_sid=s, pk=vf)).v_g_id
+                else:
+                    s_from = Verse.objects.get(v_sid=s, v_lid=1).v_g_id
+
+            if self.request.GET.get("sorat_e") and self.request.GET.get("sorat_e") != "---------":
+                s = self.request.GET.get("sorat_e")
+                if self.request.GET.get("verse_e") and self.request.GET.get("verse_e") != "---------":
+
+                    vt = int(self.request.GET.get("verse_e"))
+                    s_to = (Verse.objects.get(v_sid=s, pk=vt)).v_g_id
+                else:
+                    s_to = [v for v in Verse.objects.filter(v_sid=s)][-1].v_g_id
+
+            qr = [v for v in Verse.objects.filter(v_d_text__icontains=query) if v.v_g_id >= s_from and v.v_g_id <= s_to]
+            for verse in qr:
+                verse.set_text()
+
+
+#                print(verse.chars_count)
+            t1 = [vr.v_d_text.split(" ") for vr in qr]
+
+            result = []
+            result1 = []
+
+            #        print("here", type(t1[0]))
+            for t in t1:
+                #            print("t", t)
+                [result.append(i) for i in t for _ in range(i.count(query)) if i.count(query) > 0]
+                [result1.append(i) for i in t if i.count(query) > 0]
+#            print("result ", len(result))
+            context['Search_statistics'] = "عدد نتائج ايات البحث = " + str(
+                len(qr)) + "   , في         " + str(
+                len(result1)) + " كلمات,    " + "عدد التكرار       " + str(len(result))
+            result_s = set(result)
+            context['words_statistics'] = [str(x + ": " + str(result.count(x))) for x in result_s]
+            if len(t1) == 0:
+                context['error_message'] = "لا يوجد نتائج مطابقة للبحث"
+            context["verse_list"] = qr
         return context
 
 

@@ -3,12 +3,12 @@ from .models import Verse, Sorat, Quran
 
 
 class QuranForm(forms.ModelForm):
-    d={'---------':('---------','---------')}
+    d={}
     for i in list(Sorat.objects.all()):
         d[i.sid]=(i.sid,i.sorat_name)
-    v={'---------':('---------','---------')}
-    for i in list(Verse.objects.all()):
-        v[i.v_lid]=(i.v_lid,i.v_lid)
+    v={}
+    for i in list(Verse.objects.filter(v_sid=1)):
+        v[i.v_lid]=(i.pk,i.v_lid)
     sorat_e = forms.ChoiceField(choices=d.values(), )
     verse_e=forms.ChoiceField(choices=v.values())
 
@@ -20,7 +20,10 @@ class QuranForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['verse'].queryset = Verse.objects.none()
+        v = {}
+        for i in list(Verse.objects.filter(v_sid=1)):
+            v[i.v_lid] = (i.pk, i.v_lid)
+        self.fields['verse']=forms.ChoiceField(choices=v.values())
 #        self.fields['sorat_e'].queryset = Sorat.objects.all()
 #        print(self.sorat_e)
 #        self.fields['verse_e'].queryset = Verse.objects.none()

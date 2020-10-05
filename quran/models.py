@@ -118,15 +118,15 @@ class Verse(models.Model):
                     m.append(word)
 
         self.v_w_max_rpt="عدد التكرار: "+str(len(m))+" \n"+ reduce(lambda a, b: a+', '+b, [x for x in m] )
-        print(self.v_w_max_rpt)
+#        print(self.v_w_max_rpt)
 
     def __str__(self):
         return self.v_text
 
 class Quran(models.Model):
     name = models.CharField(max_length=200)
-    sorat=models.ForeignKey(Sorat, null=True, on_delete=models.SET_NULL, help_text="Sorat", )
-    verse=models.ForeignKey(Verse , null=True, on_delete=models.SET_NULL, help_text="Verse", )
+    sorat=models.ForeignKey(Sorat,default=1)
+    verse=models.ForeignKey(Verse , null=True, on_delete=models.SET_NULL)
 
 
     def __init__(self, *args, **kwargs):

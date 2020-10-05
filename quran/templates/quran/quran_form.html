@@ -3,17 +3,90 @@
 
 {% block body %}
 <div class="surats-container container-fluid" >
-  <h2>quran Form</h2>
 
-  <form method="get" role="search" id="quranForm" action="{% url 'quran:search'  %}" data-verses-url="{% url 'quran:ajax_load_verses' %}" novalidate>
 
-    <table>
-      {{ form.as_ul }}
-    </table>
-    <button type="submit" class="btn btn-default">Search</button>
+    <div class="row">
 
-  </form>
+        <!-- Left Album Info -->
+        <div class="col-sm-4 col-md-3">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                   <h2>تفاصيل البحث</h2>
 
+                    <form method="get" role="search" id="quranForm" action="{% url 'quran:search'  %}" data-verses-url="{% url 'quran:ajax_load_verses' %}" novalidate>
+
+                      <table>
+                        {{ form.as_ul }}
+                      </table>
+                      <div class="form-group">
+                          <input type="text" class="form-control" name="f" value="{{ request.GET.f }}">
+                      </div>
+                      <button type="submit" class="btn btn-default">Search</button>
+
+                    </form>
+
+                    {% if Search_statistics %}
+                        <p><strong>{{ Search_statistics }}</strong></p>
+                    {% endif %}
+                    {% if words_statistics %}
+                    {% for word in words_statistics %}
+                        <p><strong>{{word}}</strong></p>
+                    {% endfor %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Song Info -->
+        <div class="col-sm-8 col-md-9">
+              <ul class="nav nav-pills" style="margin-bottom: 10px;">
+                <li role="presentation" class="active"><a href="{% url 'quran:search' %}">Reset Search</a></li>
+            </ul>
+            <div class="panel panel-default">
+                <div class="panel-body">
+
+                    <h3 class="text-center">تفاصيل ايات البحث </h3>
+
+                    {% if error_message %}
+                        <p  class=text-center><strong>{{ error_message }}</strong></p>
+                    {% else %}
+
+
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th>الرقم التسلسلي</th>
+                            <th>رقم الاية</th>
+                            <th class="text-center">نص الاية</th>
+                            <th>عدد الكلمات</th>
+
+
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for verse in verse_list %}
+                            <tr>
+                                <td>{{ verse.v_g_id }}</td>
+                                <td>{{ verse.v_lid }}</td>
+                                <td>
+                                    <p class="text-center"><strong>{{ verse.v_text }}</strong></p>
+                                </td>
+                                <td> {{ verse.v_words_count }}</td>
+
+
+
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                     {% endif %}
+                  </div>
+
+            </div>
+
+        </div>
+
+    </div>
 </div>
 
   <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
@@ -21,15 +94,15 @@
     $("#id_sorat").change(function () {
       var url = $("#quranForm").attr("data-verses-url");  // get the url of the `load_verses` view
       var soratId = $(this).val();  // get the selected sorat ID from the HTML input
-
+       document.getElementById("id_sorat_e").selectedIndex=$(this).val()-1;
       $.ajax({                       // initialize an AJAX request
         url: url,                    // set the url of the request (= localhost:8000/hr/ajax/load-verses/)
         data: {
-          'sorat': soratId       // add the sorat id to the GET parameters
+          'sorat': soratId      // add the sorat id to the GET parameters
         },
         success: function (data) {   // `data` is the return of the `load_verses` view function
-          $("#id_verse").html(data);  // replace the contents of the city input with the data that came from the server
-          $("#id_sorat_e").html($(this).val());
+          $("#id_verse").html(data); // replace the contents of the city input with the data that came from the server
+          $("#id_sorat_e").trigger("change")
         }
       });
 
