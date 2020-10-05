@@ -1,0 +1,55 @@
+{% extends 'quran/base.html' %}
+{% block surats_active %}active{% endblock %}
+
+{% block body %}
+<div class="surats-container container-fluid" >
+  <h2>quran Form</h2>
+
+  <form method="get" role="search" id="quranForm" action="{% url 'quran:search'  %}" data-verses-url="{% url 'quran:ajax_load_verses' %}" novalidate>
+
+    <table>
+      {{ form.as_ul }}
+    </table>
+    <button type="submit" class="btn btn-default">Search</button>
+
+  </form>
+
+</div>
+
+  <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+  <script>
+    $("#id_sorat").change(function () {
+      var url = $("#quranForm").attr("data-verses-url");  // get the url of the `load_verses` view
+      var soratId = $(this).val();  // get the selected sorat ID from the HTML input
+
+      $.ajax({                       // initialize an AJAX request
+        url: url,                    // set the url of the request (= localhost:8000/hr/ajax/load-verses/)
+        data: {
+          'sorat': soratId       // add the sorat id to the GET parameters
+        },
+        success: function (data) {   // `data` is the return of the `load_verses` view function
+          $("#id_verse").html(data);  // replace the contents of the city input with the data that came from the server
+          $("#id_sorat_e").html($(this).val());
+        }
+      });
+
+    });
+  </script>
+<script>
+  $("#id_sorat_e").change(function () {
+      var url = $("#quranForm").attr("data-verses-url");  // get the url of the `load_verses` view
+      var soratId = $(this).val();  // get the selected sorat ID from the HTML input
+
+      $.ajax({                       // initialize an AJAX request
+        url: url,                    // set the url of the request (= localhost:8000/hr/ajax/load-verses/)
+        data: {
+          'sorat': soratId       // add the sorat id to the GET parameters
+        },
+        success: function (data) {   // `data` is the return of the `load_verses` view function
+          $("#id_verse_e").html(data);  // replace the contents of the city input with the data that came from the server
+        }
+      });
+
+    });
+  </script>
+{% endblock %}

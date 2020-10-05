@@ -1,0 +1,51 @@
+{% extends 'quran/base.html' %}
+{% block surats_active %}active{% endblock %}
+
+{% block body %}
+<div class="surats-container container-fluid" >
+
+
+<div class="row">
+ <div class="col-sm-4 col-lg-4 float-right">
+       <ul class="nav navbar-nav">
+<span class="glyphicon " aria-hidden="true">من السورة </span>&nbsp;
+	<form action="" method="get">
+          <select name="sorat_b" onchange="this.form.submit();">
+              {% if request.GET.verse_b %}
+              <option value="{{ verse_b.v_sid.sid}}" name="sorat_b" selected="selected">{{verse_b.v_sid}}</option>
+              {% endif %}
+            {% if request.GET.sorat_b %}
+            <option value="{{ sorat_b.sid}}" name="sorat_b" selected="selected">{{sorat_b.sorat_name}}</option>
+            {% else %}
+            {% for sorat in sorat_list %}
+
+            <option value="{{ sorat.sid }}" name="sorat_b">{{ sorat }}</option>
+
+            {% endfor %}
+            {% endif %}
+          </select>
+        </form>
+       </ul>
+       <ul class="nav navbar-nav">
+    <span class="glyphicon " aria-hidden="true"> الآية</span>&nbsp;
+		<form action="" method="get">
+          <select name="verse_b" onchange="this.form.submit();">
+            <option selected="selected" disabled>Select Verse</option>
+              {% if request.GET.verse_b %}
+            <option value="{{ verse_b.v_g_id}}" name="verse_b" selected="selected">{{verse_b.v_lid}}</option>
+            {% else %}
+            {% for verse in object_list %}
+            <option value="{{ verse.v_g_id }}" name="verse_begin">{{ verse.v_lid }}</option>
+            {% endfor %}
+              {% endif %}
+          </select>
+        </form>
+       </ul>
+
+</div></div></div>
+
+
+
+
+</div>
+{% endblock %}

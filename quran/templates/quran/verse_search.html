@@ -1,0 +1,19 @@
+{% extends 'quran/base.html' %}
+{% block surats_active %}active{% endblock %}
+
+{% block body %}
+<div class="surats-container container-fluid" >
+  <h2>Verse Search Form</h2>
+  <form method="get" novalidate>
+    {% csrf_token %}
+    <table>
+      {{ form.as_table }}
+    </table>
+    <button type="reset">reset</button>
+    <a href="{% url 'quran:index' %}">Nevermind</a>
+  </form>
+
+
+
+</div>
+{% endblock %}

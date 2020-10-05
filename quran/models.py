@@ -24,18 +24,25 @@ for i, x in enumerate("ابجدهوزحطيكلمنسعفصقرشتثخذضظغ�
     else:
         d[x] = i + 1
 
+class Alphabet(models.Model):
+    char_name = models.CharField(max_length=10)
+    char_d_name = models.CharField(max_length=10)
+    char_vlaue = models.IntegerField()
+
+    def __str__(self):
+        return str(self.pk)+" "+str(self.char_name)
+
 class Sorat(models.Model):
     sid = models.IntegerField()
     sorat_name = models.CharField(max_length=200)
 
-
     def __str__(self):
-        return str(self.sid) + str(self.sorat_name)
+        return str(self.sorat_name)
 
 
 class Verse(models.Model):
     v_g_id = models.IntegerField(default=0)
-    v_sid = models.ForeignKey(Sorat, on_delete=models.CASCADE, help_text="Sorat")
+    v_sid = models.ForeignKey(Sorat, on_delete=models.CASCADE, help_text="Sorat", )
     v_lid = models.IntegerField(default=0)
     v_text = models.TextField(max_length=10000,default="",null=True)
     v_d_text = models.TextField(max_length=10000, default="", null=True)
@@ -115,3 +122,16 @@ class Verse(models.Model):
 
     def __str__(self):
         return self.v_text
+
+class Quran(models.Model):
+    name = models.CharField(max_length=200)
+    sorat=models.ForeignKey(Sorat, null=True, on_delete=models.SET_NULL, help_text="Sorat", )
+    verse=models.ForeignKey(Verse , null=True, on_delete=models.SET_NULL, help_text="Verse", )
+
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+
+    def __str__(self):
+        return str(self.name)

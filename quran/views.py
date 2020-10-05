@@ -1,8 +1,9 @@
-
+from django.shortcuts import get_object_or_404, render
+from django.urls import reverse_lazy
 from django.views import generic
 from functools import reduce
-from .models import Sorat, Verse
-
+from .models import Sorat, Verse, Quran
+from .forms import QuranForm
 
 class SoratView(generic.ListView):
     template_name = "quran/index.html"
@@ -68,10 +69,6 @@ class VerseView(generic.ListView):
                 for line in fin:
                     print(line[:-1])
                     sid,gid,lid,txt = line[:-1].split(",")
-                    print(sid,type(sid))
-                    print(gid, type(gid))
-                    print(lid, type(lid))
-                    print(type(txt), txt)
                     s=Sorat.objects.get(id=sid)
                     vrs = Verse(v_g_id=int(gid), v_sid=s,v_lid=int(lid),v_text=txt)
                     vrs.save()
@@ -148,3 +145,30 @@ class VerseWordsView(generic.ListView):
         if len(t1)==0:
             context['error_message']="لا يوجد نتائج مطابقة للبحث"
         return context
+
+class QuranSearcheView(generic.CreateView):
+#    template_name = "quran/verse_search.html"
+    template_name = "quran/quran_form.html"
+    model = Quran
+    form_class = QuranForm
+
+    success_url = reverse_lazy('index')
+
+
+    def get_context_data(self, **kwargs):
+        query = self.request.GET.get("w")
+        query = str(query).strip()
+        # Call the base implementation first to get a context
+        context = super().get_context_data(**kwargs)
+        # Add in a QuerySet of all the books
+        print("query:", query)
+        t1 = [vr.v_d_text.split(" ") for vr in self.get_queryset()]
+        result = []
+        result1 = []
+        return context
+
+
+    def load_verses(request):
+        v_sid = request.GET.get('sorat')
+        verses = Verse.objects.filter(v_sid=v_sid).order_by('v_lid')
+        return render(request, 'quran/verse_dropdown_list_options.html', {'verses': verses})
