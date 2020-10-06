@@ -2,8 +2,15 @@ from django.shortcuts import get_object_or_404, render
 from django.urls import reverse_lazy
 from django.views import generic
 from functools import reduce
-from .models import Sorat, Verse, Quran
+from .models import Sorat, Verse, Quran,Alphabet
 from .forms import QuranForm
+
+
+def trans(s):
+    translation = {}
+    for x in Alphabet.objects.all():
+        translation[ord(x.char_name)] = ord(x.char_d_name)
+    return s.translate(translation)
 
 class SoratView(generic.ListView):
     template_name = "quran/index.html"
@@ -52,14 +59,14 @@ class VerseView(generic.ListView):
     template_name = "quran/verse_detail.html"
     model = Verse
     def get_queryset(self):
-        query=self.request.GET.get("q")
+        query=trans(self.request.GET.get("q"))
 #        self.load_all_verse()
         print("query is here ",self.kwargs)
         r=Verse.objects.filter(v_d_text__icontains=query)
-        for verse in r:
-            verse.set_text()
+#        for verse in r:
+#            verse.set_text()
 
-            print(verse.chars_count)
+#            print(verse.chars_count)
         return r
 
     def load_all_verse(self):
@@ -77,20 +84,21 @@ class VerseView(generic.ListView):
             print("File doesn't found")
 
     def get_context_data(self, **kwargs):
-        query = self.request.GET.get("q")
+        query = trans(self.request.GET.get("q"))
         # Call the base implementation first to get a context
         context = super().get_context_data(**kwargs)
         # Add in a QuerySet of all the books
         print("query:", query)
         t1=[vr.v_d_text.split(" ") for vr in self.get_queryset()]
+        t2 = [vr.v_text.split(" ") for vr in self.get_queryset()]
         result =[]
         result1 = []
 
 #        print("here", type(t1[0]))
-        for t in t1:
+        for a,t in enumerate(t1):
 #            print("t", t)
-            [result.append(i) for i in t for _ in range(i.count(query)) if i.count(query) > 0 ]
-            [result1.append(i) for i in t if i.count(query) > 0 ]
+            [result.append(t2[a][d]) for d, i in enumerate(t) for _ in range(i.count(query)) if i.count(query) > 0 ]
+            [result1.append(t2[a][d]) for d, i in enumerate(t) if i.count(query) > 0 ]
         print("result ",len(result))
         context['Search_statistics'] = "عدد نتائج ايات البحث = "+str(len(self.get_queryset()))+"   , في         "+str(len(result1))+" كلمات,    "+ "عدد التكرار       " +str(len(result))
         result_s = set(result)
@@ -105,7 +113,7 @@ class VerseWordsView(generic.ListView):
 
 
     def get_queryset(self):
-        query=self.request.GET.get("w")
+        query=trans(self.request.GET.get("w"))
         print("query is here VerseWordsView",query)
         query=str(query).strip()
         r=Verse.objects.filter(v_d_text__icontains=query)
@@ -123,7 +131,7 @@ class VerseWordsView(generic.ListView):
         return r
 
     def get_context_data(self, **kwargs):
-        query = self.request.GET.get("w")
+        query = trans(self.request.GET.get("w"))
         query = str(query).strip()
         # Call the base implementation first to get a context
         context = super().get_context_data(**kwargs)

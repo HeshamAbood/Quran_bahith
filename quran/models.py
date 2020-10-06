@@ -2,6 +2,15 @@ from django.db import models
 import json
 from functools import reduce
 
+
+
+def trans(s):
+    translation = {}
+    for x in Alphabet.objects.all():
+        translation[ord(x.char_name)] = ord(x.char_d_name)
+    return s.translate(translation)
+
+
 d = {}
 ad={"ا": 0, "ب": 0, "ج": 0, "د": 0, "ه": 0, "و": 0, "ز": 0, "ح": 0, "ط": 0, "ي": 0, "ك": 0, "ل": 0, "م": 0, "ن": 0, "س": 0, "ع": 0, "ف": 0, "ص": 0, "ق": 0, "ر": 0, "ش": 0, "ت": 0, "ث": 0, "خ": 0, "ذ": 0, "ض": 0, "ظ": 0, "غ": 0, "أ": 0, "إ": 0,  "ء": 0, "ئ": 0, "ى": 0, "ؤ": 0, " ": 0, "ة": 0,"آ":0}
 for i, x in enumerate("ابجدهوزحطيكلمنسعفصقرشتثخذضظغأءئىؤآإ ة"):
@@ -61,9 +70,12 @@ class Verse(models.Model):
 
     def set_text(self):
         self.v_d_text=""
+        t={}
+        for x in Alphabet.objects.all():
+           t[x.char_name]=x.char_d_name
         for c in self.v_text:
-            if c in ad.keys():
-                self.v_d_text+=c
+            if c in t.keys():
+                self.v_d_text+=t[c]
 #        print("type(ad) ",type(ad))
 #        print("type(self.chars_count) ",type(self.chars_count))
         self.chars_count={}
