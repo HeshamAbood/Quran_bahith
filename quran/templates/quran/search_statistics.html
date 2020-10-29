@@ -1,0 +1,29 @@
+{% if s_result_count %}
+<p><strong>عدد النتائج: {{ s_result_count }} </strong></p>
+{% endif %}
+{% if Search_statistics %}
+<p><strong>{{ Search_statistics }}</strong></p>
+{% endif %}
+{% if s_c %}
+<p><strong>عدد السور: {{ s_c }}</strong></p>
+{% endif %}
+{% if s_sum %}
+<p><strong>مجموع أرقام السور : {{ s_sum }}</strong></p>
+{% endif %}
+{% if v_sum %}
+<p><strong>مجموع أيات البحت: {{ v_sum }}</strong></p>
+{% endif %}
+{% if words_statistics %}
+<p><strong>----------------------</strong></p>
+<p><strong>التكرار بحسب الايات</strong></p>
+{% if v_q_rpt %}
+{% for v, c in v_q_rpt %}
+<p><strong> تكرر</strong> {{v}} <strong> في </strong>{{c}} آية</p>
+{% endfor %}
+{% endif %}
+<p><strong>----------------------</strong></p>
+<p><strong>نتائج الكلمات في البحث</strong></p>
+{% for word in words_statistics %}
+<p><strong>{{word}}</strong></p>
+{% endfor %}
+{% endif %}

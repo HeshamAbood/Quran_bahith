@@ -86,9 +86,9 @@ class Verse(models.Model):
             else:
                 self.chars_count[k] = 1
 
-        self.chars_count_d='<table class="table"> <thead> <tr>'
-        self.chars_count_d += '<th>' + 'عدد الحروف' + '</th>'
-        self.chars_count_d += '<th>' + 'مجموع الحروف' + '</th>'
+        self.chars_count_d='<table class="table col-sm-8 col-md-10"> <thead> <tr>'
+        self.chars_count_d += '<th>' + 'عدد<br>الحروف' + '</th>'
+        self.chars_count_d += '<th>' + 'مجموع<br>الحروف' + '</th>'
         for k in self.chars_count.keys():
             if k!=" ":
                 self.chars_count_d += '<th>'+ str(k)+ '</th>'
@@ -137,7 +137,7 @@ class Verse(models.Model):
 
 class Quran(models.Model):
     name = models.CharField(max_length=200)
-    sorat=models.ForeignKey(Sorat,default=1)
+    sorat=models.ForeignKey(Sorat,null=True, on_delete=models.SET_NULL, default=1)
     verse=models.ForeignKey(Verse , null=True, on_delete=models.SET_NULL)
 
 

@@ -65,6 +65,25 @@
                         {% endfor %}
                         </tbody>
                     </table>
+
+                    <div class="pagination">
+						<span class="step-links">
+							{% if page_obj.has_previous %}
+								<a href="{{ request.get_full_path}}&?page=1">&laquo; الأولى</a>
+								<a href="?w={{ request.GET.w }}&?page={{ page_obj.previous_page_number }}">السابق</a>
+							{% endif %}
+
+							<span class="current">
+								صفحة  {{ page_obj.number }} من {{ page_obj.paginator.num_pages }}.
+							</span>
+
+							{% if page_obj.has_next %}
+								<a href="?w={{ request.GET.w }}&page={{ page_obj.next_page_number }}">التالي</a>
+								<a href="{{ request.get_full_path}}&page={{ page_obj.paginator.num_pages }}">الأخير &raquo;</a>
+							{% endif %}
+						</span>
+					</div>
+
                      {% endif %}
                 </div>
 

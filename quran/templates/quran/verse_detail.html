@@ -36,35 +36,54 @@
 					<div class=" table-responsive">
 						<table class="table">
 							<thead>
-								<tr>
-									<th>الرقم التسلسلي</th>
-									<th>رقم الاية</th>
-									<th class="col-sm-4 col-md-5">نص الاية</th>
-									<th>عدد الكلمات</th>
-									<th>تكرار الحروف</th>
+							<tr>
+								<th>الرقم التسلسلي</th>
+								<th>رقم الاية</th>
+								<th class="col-sm-4 col-md-5">نص الاية</th>
+								<th>عدد الكلمات</th>
+								<th>تكرار الحروف</th>
 
-								</tr>
+							</tr>
 							</thead>
 							<tbody>
-								{% for verse in object_list %}
-								<tr>
-									<td>{{ verse.v_g_id }}</td>
-									<td>{{ verse.v_lid }}</td>
-									<td>
-										<p class="text-center ">{{ verse.v_text }}</p>
-									</td>
-									<td><div class="table-responsive"> {{ verse.v_words_count }} </div></td>
-									<td>{% autoescape off %}
-										{{ verse.chars_count_d }}
-										{% endautoescape %}
-									</td>
+							{% for verse in object_list %}
+							<tr>
+								<td>{{ verse.v_g_id }}</td>
+								<td>{{ verse.v_lid }}</td>
+								<td>
+									<p class="text-center ">{{ verse.v_text }}</p>
+								</td>
+								<td><div class="table-responsive"> {{ verse.v_words_count }} </div></td>
+								<td>{% autoescape off %}
+									{{ verse.chars_count_d }}
+									{% endautoescape %}
+								</td>
 
 
-								</tr>
-								{% endfor %}
+							</tr>
+							{% endfor %}
 							</tbody>
 						</table>
 					</div>
+
+					<div class="pagination">
+						<span class="step-links">
+							{% if page_obj.has_previous %}
+								<a href="{{ request.get_full_path}}&?page=1">&laquo; الأولى</a>
+								<a href="?q={{ request.GET.q }}&?page={{ page_obj.previous_page_number }}">السابق</a>
+							{% endif %}
+
+							<span class="current">
+								صفحة  {{ page_obj.number }} من {{ page_obj.paginator.num_pages }}.
+							</span>
+
+							{% if page_obj.has_next %}
+								<a href="?q={{ request.GET.q }}&page={{ page_obj.next_page_number }}">التالي</a>
+								<a href="{{ request.get_full_path}}&page={{ page_obj.paginator.num_pages }}">الأخير &raquo;</a>
+							{% endif %}
+						</span>
+					</div>
+
 					{% endif %}
 
 				</div>

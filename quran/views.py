@@ -1,9 +1,14 @@
+import csv
+
+from django.core.paginator import Paginator
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse_lazy
 from django.views import generic
 from functools import reduce
 from .models import Sorat, Verse, Quran,Alphabet
 from .forms import QuranForm
+from django.core.paginator import Paginator
 
 
 def trans(s):
@@ -58,6 +63,8 @@ class DetailView(generic.DetailView):
 class VerseView(generic.ListView):
     template_name = "quran/verse_detail.html"
     model = Verse
+    paginate_by = 20
+
     def get_queryset(self):
         query=trans(self.request.GET.get("q"))
 #        self.load_all_verse()
@@ -110,7 +117,7 @@ class VerseView(generic.ListView):
 class VerseWordsView(generic.ListView):
     template_name = "quran/verse_words_detail.html"
     model = Verse
-
+    paginate_by = 20
 
     def get_queryset(self):
         query=trans(self.request.GET.get("w"))
@@ -152,6 +159,9 @@ class VerseWordsView(generic.ListView):
         context['words_statistics'] =[str(x+": "+str(result.count(x))) for x in result_s]
         if len(t1)==0:
             context['error_message']="لا يوجد نتائج مطابقة للبحث"
+
+        if self.request.GET.get("page"):
+            context.pop('page',None)
         return context
 
 class QuranSearcheView(generic.CreateView):
@@ -159,8 +169,9 @@ class QuranSearcheView(generic.CreateView):
     template_name = "quran/quran_form.html"
     model = Quran
     form_class = QuranForm
+    paginate_by = 20
 
-    success_url = reverse_lazy('index')
+#    success_url = reverse_lazy('index')
 
 
     def get_context_data(self, **kwargs):
@@ -188,15 +199,25 @@ class QuranSearcheView(generic.CreateView):
                     s_to = (Verse.objects.get(v_sid=s, pk=vt)).v_g_id
                 else:
                     s_to = [v for v in Verse.objects.filter(v_sid=s)][-1].v_g_id
-
-            qr = [v for v in Verse.objects.filter(v_d_text__icontains=query) if v.v_g_id >= s_from and v.v_g_id <= s_to]
+            if self.request.GET.get("options"):
+                if int(self.request.GET.get("options"))==2:
+                    qr = [v for v in Verse.objects.filter(v_d_text__istartswith=query) if
+                      v.v_g_id >= s_from and v.v_g_id <= s_to]
+                elif int(self.request.GET.get("options"))==3:
+                    qr = [v for v in Verse.objects.filter(v_d_text__endswith=query) if
+                          v.v_g_id >= s_from and v.v_g_id <= s_to]
+                else:
+                    qr = [v for v in Verse.objects.filter(v_d_text__icontains=query) if v.v_g_id >= s_from and v.v_g_id <= s_to]
             for verse in qr:
                 verse.set_text()
 
 
-#                print(verse.chars_count)
+#                print("verse_id",verse.v_sid.sid)
             t1 = [vr.v_d_text.split(" ") for vr in qr]
-
+            s=set([int(vq.v_sid.sid) for vq in qr])
+            s_c=len(s)
+            s_sum=sum(s)
+            v_sum=sum([int(vq.v_lid) for vq in qr])
             result = []
             result1 = []
 
@@ -211,9 +232,34 @@ class QuranSearcheView(generic.CreateView):
                 len(result1)) + " كلمات,    " + "عدد التكرار       " + str(len(result))
             result_s = set(result)
             context['words_statistics'] = [str(x + ": " + str(result.count(x))) for x in result_s]
+            context['s_c']=s_c
+            context['s_sum'] = s_sum
+            context['v_sum'] = v_sum
+
             if len(t1) == 0:
                 context['error_message'] = "لا يوجد نتائج مطابقة للبحث"
-            context["verse_list"] = qr
+            paginator = Paginator(qr, 20)
+            if self.request.GET.get("page"):
+                pn=self.request.GET.get("page")
+                if pn>1:
+#                    context["verse_list"] =paginator.page(pn)
+                    context["verse_list"] = qr
+            else:
+#                    context["verse_list"] = paginator.page(1)
+                    context["verse_list"] = qr
+
+            s_result_count=0
+            v_q_rpt={}
+            for v in qr:
+                c_r=v.v_d_text.count(query)
+                s_result_count+=c_r
+                if c_r in v_q_rpt.keys():
+                    v_q_rpt[c_r]=v_q_rpt[c_r]+1
+                else:
+                    v_q_rpt[c_r]=1
+            v_q_rpt={k: v for k, v in sorted(v_q_rpt.items(), key=lambda item: item[1])}
+            context["v_q_rpt"] =list(v_q_rpt.items())
+            context["s_result_count"] = s_result_count
         return context
 
 
@@ -221,3 +267,68 @@ class QuranSearcheView(generic.CreateView):
         v_sid = request.GET.get('sorat')
         verses = Verse.objects.filter(v_sid=v_sid).order_by('v_lid')
         return render(request, 'quran/verse_dropdown_list_options.html', {'verses': verses})
+
+    def load_search_result( request):
+        print("ajax_activated")
+        print(request.GET.get("f"),request.GET.get("verse"),request.GET.get("sorat"),request.GET.get("verse_e"),request.GET.get("sorat_e"))
+        if (request.GET.get("f")):
+            query = request.GET.get("f")
+            # Call the base implementation first to get a context
+            # Add in a QuerySet of all the books
+            print("query:", query)
+            s_from = 1
+            s_to = 6236
+            if request.GET.get("sorat") and request.GET.get("sorat") != "---------":
+                s = request.GET.get("sorat")
+                if request.GET.get("verse") and request.GET.get("verse") != "---------":
+                    vf = int(request.GET.get("verse"))
+                    s_from = (Verse.objects.get(v_sid=s, pk=vf)).v_g_id
+                else:
+                    s_from = Verse.objects.get(v_sid=s, v_lid=1).v_g_id
+
+            if request.GET.get("sorat_e") and request.GET.get("sorat_e") != "---------":
+                s = request.GET.get("sorat_e")
+                if request.GET.get("verse_e") and request.GET.get("verse_e") != "---------":
+
+                    vt = int(request.GET.get("verse_e"))
+                    s_to = (Verse.objects.get(v_sid=s, pk=vt)).v_g_id
+                else:
+                    s_to = [v for v in Verse.objects.filter(v_sid=s)][-1].v_g_id
+            if request.GET.get("options"):
+                if int(request.GET.get("options")) == 2:
+                    qr = [v for v in Verse.objects.filter(v_d_text__istartswith=query) if
+                          v.v_g_id >= s_from and v.v_g_id <= s_to]
+                elif int(request.GET.get("options")) == 3:
+                    qr = [v for v in Verse.objects.filter(v_d_text__endswith=query) if
+                          v.v_g_id >= s_from and v.v_g_id <= s_to]
+                else:
+                    qr = [v for v in Verse.objects.filter(v_d_text__icontains=query) if
+                          v.v_g_id >= s_from and v.v_g_id <= s_to]
+            for verse in qr:
+                verse.set_text()
+                print(verse)
+            verse_list = qr
+        else:
+            verse_list=""
+
+        return render(request, 'quran/verse_search.html', {'verse_list': verse_list})
+
+class QuranSearcheExport(generic.CreateView):
+    def _get_csv(request, from_date, to_date):
+
+        response = HttpResponse(mimetype='text/csv')
+        response['Content-Disposition'] = 'attachment; filename="reports-%s/%s.csv"' % (from_date, to_date)
+
+        for client in request.GET.getlist('client[]'):
+            account = Sorat.objects.all().filter(
+                client_id=client
+            )[0]
+            writer = csv.writer(response)
+            writer.writerow([account.account_name])
+            writer.writerow(['Date', 'Daily Total MBs'])
+            company_report = sorted(client, from_date, to_date)
+            company_report = sorted(company_report, key=lambda item: item['date'])
+            for report in company_report:
+                writer.writerow([report['date'], report['daily_totalmbs']])
+
+        return response

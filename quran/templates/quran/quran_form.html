@@ -2,35 +2,57 @@
 {% block surats_active %}active{% endblock %}
 
 {% block body %}
-<div class="surats-container container-fluid" >
+<div class="surats-container container-fluid">
 
 
     <div class="row">
 
         <!-- Left Album Info -->
-        <div class="col-sm-4 col-md-3">
+        <div class="text-center col-sm-4 col-md-2">
             <div class="panel panel-default">
                 <div class="panel-body">
-                   <h2>تفاصيل البحث</h2>
+                    <h2>تفاصيل البحث</h2>
 
-                    <form method="get" role="search" id="quranForm" action="{% url 'quran:search'  %}" data-verses-url="{% url 'quran:ajax_load_verses' %}" novalidate>
+                    <form method="get" role="search" id="quranForm" action="{% url 'quran:search'  %}"
+                          data-verses-url="{% url 'quran:ajax_load_verses' %}"
+                          search-result-url="{% url 'quran:ajax_load_search_result' %}" novalidate>
 
-                      <table>
-                        {{ form.as_ul }}
-                      </table>
-                      <div class="form-group">
-                          <input type="text" class="form-control" name="f" value="{{ request.GET.f }}">
-                      </div>
-                      <button type="submit" class="btn btn-default">Search</button>
+                        <table>
+                            {{ form.as_ul }}
+                        </table>
+                        <div class="form-group">
+                            <input type="text" id="search_text" class="form-control" name="f" value="{{ request.GET.f }}">
+                        </div>
+                        <button type="button" id="search_data" class="btn btn-default">Search</button>
 
                     </form>
-
+                    {% if s_result_count %}
+                    <p><strong>عدد النتائج: {{ s_result_count }} </strong></p>
+                    {% endif %}
                     {% if Search_statistics %}
-                        <p><strong>{{ Search_statistics }}</strong></p>
+                    <p><strong>{{ Search_statistics }}</strong></p>
+                    {% endif %}
+                    {% if s_c %}
+                    <p><strong>عدد السور: {{ s_c }}</strong></p>
+                    {% endif %}
+                    {% if s_sum %}
+                    <p><strong>مجموع أرقام السور : {{ s_sum }}</strong></p>
+                    {% endif %}
+                    {% if v_sum %}
+                    <p><strong>مجموع أيات البحت: {{ v_sum }}</strong></p>
                     {% endif %}
                     {% if words_statistics %}
+                    <p><strong>----------------------</strong></p>
+                    <p><strong>التكرار بحسب الايات</strong></p>
+                    {% if v_q_rpt %}
+                    {% for v, c in v_q_rpt %}
+                    <p><strong> تكرر</strong> {{v}} <strong> في </strong>{{c}} آية</p>
+                    {% endfor %}
+                    {% endif %}
+                    <p><strong>----------------------</strong></p>
+                    <p><strong>نتائج الكلمات في البحث</strong></p>
                     {% for word in words_statistics %}
-                        <p><strong>{{word}}</strong></p>
+                    <p><strong>{{word}}</strong></p>
                     {% endfor %}
                     {% endif %}
                 </div>
@@ -38,9 +60,10 @@
         </div>
 
         <!-- Right Song Info -->
-        <div class="col-sm-8 col-md-9">
-              <ul class="nav nav-pills" style="margin-bottom: 10px;">
-                <li role="presentation" class="active"><a href="{% url 'quran:search' %}">Reset Search</a></li>
+        <div class="col-sm-8 col-md-10">
+            <ul class="nav nav-pills" style="margin-bottom: 10px;">
+                <li role="presentation" id="search_csv" class="active" data-verses-url="{% url 'quran:search_csv' %}"><a
+                        href="{% url 'quran:search_csv' %}">Export Results</a></li>
             </ul>
             <div class="panel panel-default">
                 <div class="panel-body">
@@ -48,7 +71,7 @@
                     <h3 class="text-center">تفاصيل ايات البحث </h3>
 
                     {% if error_message %}
-                        <p  class=text-center><strong>{{ error_message }}</strong></p>
+                    <p class=text-center><strong>{{ error_message }}</strong></p>
                     {% else %}
 
 
@@ -59,28 +82,35 @@
                             <th>رقم الاية</th>
                             <th class="text-center">نص الاية</th>
                             <th>عدد الكلمات</th>
-
+                            <th class="text-center">تكرار الحروف</th>
 
                         </tr>
                         </thead>
-                        <tbody>
-                        {% for verse in verse_list %}
-                            <tr>
-                                <td>{{ verse.v_g_id }}</td>
-                                <td>{{ verse.v_lid }}</td>
-                                <td>
-                                    <p class="text-center"><strong>{{ verse.v_text }}</strong></p>
-                                </td>
-                                <td> {{ verse.v_words_count }}</td>
+                        <tbody id="search_data_result">
 
-
-
-                            </tr>
-                        {% endfor %}
                         </tbody>
                     </table>
-                     {% endif %}
-                  </div>
+
+                    <div class="pagination">
+						<span class="step-links">
+							{% if page_obj.has_previous %}
+								<a href="{{ request.get_full_path}}&?page=1">&laquo; الأولى</a>
+								<a href="?sorat={{ request.GET.sorat }}&?verse={{ request.GET.verse }}&?sorat_e={{ request.GET.sorat_e }}&?verse_e={{ request.GET.verse_e }}&?options={{ request.GET.options }}&?f={{ request.GET.f }}&?page={{ page_obj.previous_page_number }}">السابق</a>
+							{% endif %}
+
+							<span class="current">
+								صفحة  {{ page_obj.number }} من {{ page_obj.paginator.num_pages }}.
+							</span>
+
+							{% if page_obj.has_next %}
+								<a href="?sorat={{ request.GET.sorat }}&?verse={{ request.GET.verse }}&?sorat_e={{ request.GET.sorat_e }}&?verse_e={{ request.GET.verse_e }}&?options={{ request.GET.options }}&?f={{ request.GET.f }}&?page={{ page_obj.next_page_number }}">التالي</a>
+								<a href="{{ request.get_full_path}}&page={{ page_obj.paginator.num_pages }}">الأخير &raquo;</a>
+							{% endif %}
+						</span>
+					</div>
+
+                    {% endif %}
+                </div>
 
             </div>
 
@@ -89,25 +119,37 @@
     </div>
 </div>
 
-  <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
-  <script>
-    $("#id_sorat").change(function () {
-      var url = $("#quranForm").attr("data-verses-url");  // get the url of the `load_verses` view
-      var soratId = $(this).val();  // get the selected sorat ID from the HTML input
-       document.getElementById("id_sorat_e").selectedIndex=$(this).val()-1;
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+<script>
+    $("#search_data").click(function () {
+      var url = $("#quranForm").attr("search-result-url");  // get the url of the `load_verses` view
+      var soratId = $(id_sorat).val();  // get the selected sorat ID from the HTML input
+      var verseId = $(id_verse).val();
+      var sorat_eId = $(id_sorat_e).val();
+      var verse_eId = $(id_verse_e).val();
+      var optionsId = $(id_options).val();
+      var search_txt = $(search_text).val();
+
       $.ajax({                       // initialize an AJAX request
         url: url,                    // set the url of the request (= localhost:8000/hr/ajax/load-verses/)
         data: {
-          'sorat': soratId      // add the sorat id to the GET parameters
+          'sorat': soratId,      // add the sorat id to the GET parameters
+          'verse': verseId,      // add the sorat id to the GET parameters
+          'sorat_e': sorat_eId,      // add the sorat id to the GET parameters
+          'options': optionsId,      // add the sorat id to the GET parameters
+          'verse_e': verse_eId,      // add the sorat id to the GET parameters
+          'f': search_txt      // add the sorat id to the GET parameters
+
         },
         success: function (data) {   // `data` is the return of the `load_verses` view function
-          $("#id_verse").html(data); // replace the contents of the city input with the data that came from the server
-          $("#id_sorat_e").trigger("change")
+          $("#search_data_result").html(data); // replace the contents of the city input with the data that came from the server
+
         }
       });
 
     });
-  </script>
+
+</script>
 <script>
   $("#id_sorat_e").change(function () {
       var url = $("#quranForm").attr("data-verses-url");  // get the url of the `load_verses` view
@@ -124,5 +166,25 @@
       });
 
     });
-  </script>
+
+</script>
+<script>
+        $("#id_sorat").change(function () {
+          var url = $("#quranForm").attr("data-verses-url");  // get the url of the `load_verses` view
+          var soratId = $(this).val();  // get the selected sorat ID from the HTML input
+           document.getElementById("id_sorat_e").selectedIndex=$(this).val()-1;
+          $.ajax({                       // initialize an AJAX request
+            url: url,                    // set the url of the request (= localhost:8000/quran/ajax/load-verses/)
+            data: {
+              'sorat': soratId      // add the sorat id to the GET parameters
+            },
+            success: function (data) {   // `data` is the return of the `load_verses` view function
+              $("#id_verse").html(data); // replace the contents of the city input with the data that came from the server
+              $("#id_sorat_e").trigger("change")
+            }
+          });
+
+        });
+
+</script>
 {% endblock %}
