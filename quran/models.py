@@ -86,7 +86,7 @@ class Verse(models.Model):
             else:
                 self.chars_count[k] = 1
 
-        self.chars_count_d='<table class="table col-sm-8 col-md-10"> <thead> <tr>'
+        self.chars_count_d='<table class="table col-sm-6 col-md-8"> <thead> <tr>'
         self.chars_count_d += '<th>' + 'عدد<br>الحروف' + '</th>'
         self.chars_count_d += '<th>' + 'مجموع<br>الحروف' + '</th>'
         for k in self.chars_count.keys():

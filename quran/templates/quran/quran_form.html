@@ -25,36 +25,13 @@
                         </div>
                         <button type="button" id="search_data" class="btn btn-default">Search</button>
 
+                         <span id="search_result_statistics">
+
+                         </span>
                     </form>
-                    {% if s_result_count %}
-                    <p><strong>عدد النتائج: {{ s_result_count }} </strong></p>
-                    {% endif %}
-                    {% if Search_statistics %}
-                    <p><strong>{{ Search_statistics }}</strong></p>
-                    {% endif %}
-                    {% if s_c %}
-                    <p><strong>عدد السور: {{ s_c }}</strong></p>
-                    {% endif %}
-                    {% if s_sum %}
-                    <p><strong>مجموع أرقام السور : {{ s_sum }}</strong></p>
-                    {% endif %}
-                    {% if v_sum %}
-                    <p><strong>مجموع أيات البحت: {{ v_sum }}</strong></p>
-                    {% endif %}
-                    {% if words_statistics %}
-                    <p><strong>----------------------</strong></p>
-                    <p><strong>التكرار بحسب الايات</strong></p>
-                    {% if v_q_rpt %}
-                    {% for v, c in v_q_rpt %}
-                    <p><strong> تكرر</strong> {{v}} <strong> في </strong>{{c}} آية</p>
-                    {% endfor %}
-                    {% endif %}
-                    <p><strong>----------------------</strong></p>
-                    <p><strong>نتائج الكلمات في البحث</strong></p>
-                    {% for word in words_statistics %}
-                    <p><strong>{{word}}</strong></p>
-                    {% endfor %}
-                    {% endif %}
+
+
+
                 </div>
             </div>
         </div>
@@ -74,23 +51,10 @@
                     <p class=text-center><strong>{{ error_message }}</strong></p>
                     {% else %}
 
+                    {% autoescape off %}
+                    <div id="search_data_result">
 
-                    <table class="table">
-                        <thead>
-                        <tr>
-                            <th>الرقم التسلسلي</th>
-                            <th>رقم الاية</th>
-                            <th class="text-center">نص الاية</th>
-                            <th>عدد الكلمات</th>
-                            <th class="text-center">تكرار الحروف</th>
-
-                        </tr>
-                        </thead>
-                        <tbody id="search_data_result">
-
-                        </tbody>
-                    </table>
-
+                    </div>{% endautoescape %}
                     <div class="pagination">
 						<span class="step-links">
 							{% if page_obj.has_previous %}
@@ -142,8 +106,11 @@
 
         },
         success: function (data) {   // `data` is the return of the `load_verses` view function
-          $("#search_data_result").html(data); // replace the contents of the city input with the data that came from the server
-
+          var $holder = $('<div/>').html(data);
+          $('#search_data_result').html($('#search_data_result', $holder).html());
+          $('#search_result_statistics').html($('#search_result_statistics', $holder).html());
+          console.log( $('<table/>').html($('#search_data_result', $holder).html()));
+          console.log( $('#search_result_statistics', $holder).html());
         }
       });
 

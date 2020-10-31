@@ -308,10 +308,62 @@ class QuranSearcheView(generic.CreateView):
                 verse.set_text()
                 print(verse)
             verse_list = qr
-        else:
-            verse_list=""
 
-        return render(request, 'quran/verse_search.html', {'verse_list': verse_list})
+            t1 = [vr.v_d_text.split(" ") for vr in qr]
+            s=set([int(vq.v_sid.sid) for vq in qr])
+            s_c=len(s)
+            s_sum=sum(s)
+            v_sum=sum([int(vq.v_lid) for vq in qr])
+            result = []
+            result1 = []
+
+            for t in t1:
+                [result.append(i) for i in t for _ in range(i.count(query)) if i.count(query) > 0]
+                [result1.append(i) for i in t if i.count(query) > 0]
+            Search_statistics = "عدد نتائج ايات البحث = " + str(
+                len(qr)) + "   , في         " + str(
+                len(result1)) + " كلمات,    " + "عدد التكرار       " + str(len(result))
+            result_s = set(result)
+            words_statistics = [str(x + ": " + str(result.count(x))) for x in result_s]
+            s_c=s_c
+            s_sum = s_sum
+            v_sum = v_sum
+
+            if len(t1) == 0:
+                error_message = "لا يوجد نتائج مطابقة للبحث"
+
+            s_result_count=0
+            v_q_rpt={}
+            for v in qr:
+                c_r=v.v_d_text.count(query)
+                s_result_count+=c_r
+                if c_r in v_q_rpt.keys():
+                    v_q_rpt[c_r]=v_q_rpt[c_r]+1
+                else:
+                    v_q_rpt[c_r]=1
+            v_q_rpt={k: v for k, v in sorted(v_q_rpt.items(), key=lambda item: item[1])}
+            v_q_rpt =list(v_q_rpt.items())
+            s_result_count = s_result_count
+
+        else:
+            verse_list = None
+            Search_statistics = None
+            words_statistics = None
+            s_c = None
+            s_sum = None
+            v_sum = None
+            v_q_rpt = None
+            s_result_count = None
+
+        return render(request, 'quran/verse_search.html',
+                      {'verse_list': verse_list,
+                       'Search_statistics': Search_statistics,
+                       'words_statistics': words_statistics,
+                       's_c': s_c,
+                       's_sum': s_sum,
+                       'v_sum': v_sum,
+                       'v_q_rpt':v_q_rpt,
+                       's_result_count': s_result_count})
 
 class QuranSearcheExport(generic.CreateView):
     def _get_csv(request, from_date, to_date):
