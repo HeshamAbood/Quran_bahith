@@ -24,10 +24,43 @@
                             <input type="text" id="search_text" class="form-control" name="f" value="{{ request.GET.f }}">
                         </div>
                         <button type="button" id="search_data" class="btn btn-default">Search</button>
+                        {%  if  enter_s  %}
+                            {% if s_result_count %}
+                                <span id="search_result_statistics2">
+                                <p><strong>عدد النتائج: {{ s_result_count }} </strong></p>
+                                {% endif %}
+                                {% if Search_statistics %}
+                                <p><strong>{{ Search_statistics }}</strong></p>
+                                {% endif %}
+                                {% if s_c %}
+                                <p><strong>عدد السور: {{ s_c }}</strong></p>
+                                {% endif %}
+                                {% if s_sum %}
+                                <p><strong>مجموع أرقام السور : {{ s_sum }}</strong></p>
+                                {% endif %}
+                                {% if v_sum %}
+                                <p><strong>مجموع أيات البحت: {{ v_sum }}</strong></p>
+                                {% endif %}
+                                {% if words_statistics %}
+                                <p><strong>----------------------</strong></p>
+                                <p><strong>التكرار بحسب الايات</strong></p>
+                                {% if v_q_rpt %}
+                                {% for v, c in v_q_rpt %}
+                                <p><strong> تكرر</strong> {{v}} <strong> في </strong> <a href="{{ request.get_full_path}}&qrpt={{ v }}"> {{c}} آية </a> </p>
+                                {% endfor %}
+                                {% endif %}
+                                <p><strong>----------------------</strong></p>
+                                <p><strong>نتائج الكلمات في البحث</strong></p>
+                                {% for word in words_statistics %}
+                                <p><strong>{{word}}</strong></p>
+                                {% endfor %}
+                                {% endif %}
+                                </span>
+                        {% endif %}
+                             <span id="search_result_statistics">
 
-                         <span id="search_result_statistics">
+                             </span>
 
-                         </span>
                     </form>
 
 
@@ -51,10 +84,43 @@
                     <p class=text-center><strong>{{ error_message }}</strong></p>
                     {% else %}
 
-                    {% autoescape off %}
-                    <div id="search_data_result">
+                        {%  if  enter_s  %}
+                            <table class="table" id="search_data_result2">
+                                <thead>
+                                    <tr>
+                                        <th>الرقم التسلسلي</th>
+                                        <th>رقم الاية</th>
+                                        <th class="text-center">نص الاية</th>
+                                        <th>عدد الكلمات</th>
+                                        <th class="text-center">تكرار الحروف</th>
 
-                    </div>{% endautoescape %}
+                                    </tr>
+                                    </thead>
+                                <tbody >
+                                    {% for verse in verse_list %}
+                                        <tr>
+                                            <td>{{ verse.v_g_id }}</td>
+                                            <td>{{ verse.v_lid }}</td>
+                                            <td>
+                                                <p class="text-center"><strong>{{ verse.v_text }}</strong></p>
+                                            </td>
+                                            <td> {{ verse.v_words_count }}</td>
+                                            <td>{% autoescape off %}
+                                                {{ verse.chars_count_d }}
+                                                {% endautoescape %}
+                                            </td>
+
+
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+
+                        {% else %}
+                        <div id="search_data_result">
+
+                        </div>
+                    {% endif %}
                     <div class="pagination">
 						<span class="step-links">
 							{% if page_obj.has_previous %}
@@ -93,9 +159,12 @@
       var verse_eId = $(id_verse_e).val();
       var optionsId = $(id_options).val();
       var search_txt = $(search_text).val();
+      if (document.getElementById('search_data_result2') != null) {$('#search_data_result2').attr('id', 'search_data_result')};
+	  if (document.getElementById('search_result_statistics2') != null) {$('#search_result_statistics2').attr('id', 'search_result_statistics')};
 
       $.ajax({                       // initialize an AJAX request
         url: url,                    // set the url of the request (= localhost:8000/hr/ajax/load-verses/)
+
         data: {
           'sorat': soratId,      // add the sorat id to the GET parameters
           'verse': verseId,      // add the sorat id to the GET parameters
@@ -107,10 +176,10 @@
         },
         success: function (data) {   // `data` is the return of the `load_verses` view function
           var $holder = $('<div/>').html(data);
+
           $('#search_data_result').html($('#search_data_result', $holder).html());
           $('#search_result_statistics').html($('#search_result_statistics', $holder).html());
-          console.log( $('<table/>').html($('#search_data_result', $holder).html()));
-          console.log( $('#search_result_statistics', $holder).html());
+
         }
       });
 
@@ -139,7 +208,8 @@
         $("#id_sorat").change(function () {
           var url = $("#quranForm").attr("data-verses-url");  // get the url of the `load_verses` view
           var soratId = $(this).val();  // get the selected sorat ID from the HTML input
-           document.getElementById("id_sorat_e").selectedIndex=$(this).val()-1;
+          if (document.getElementById('id_sorat_e').selectedIndex< soratId ){
+           document.getElementById("id_sorat_e").selectedIndex=$(this).val()-1;}
           $.ajax({                       // initialize an AJAX request
             url: url,                    // set the url of the request (= localhost:8000/quran/ajax/load-verses/)
             data: {
@@ -147,7 +217,8 @@
             },
             success: function (data) {   // `data` is the return of the `load_verses` view function
               $("#id_verse").html(data); // replace the contents of the city input with the data that came from the server
-              $("#id_sorat_e").trigger("change")
+
+              $("#id_sorat_e").trigger("change");
             }
           });
 

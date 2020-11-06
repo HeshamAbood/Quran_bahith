@@ -18,7 +18,7 @@
 <p><strong>التكرار بحسب الايات</strong></p>
 {% if v_q_rpt %}
 {% for v, c in v_q_rpt %}
-<p><strong> تكرر</strong> {{v}} <strong> في </strong>{{c}} آية</p>
+<p><strong> تكرر</strong> {{v}} <strong> في </strong> <a href="{{ request.get_full_path}}&qrpt={{ v }}"> {{c}} آية </a> </p>
 {% endfor %}
 {% endif %}
 <p><strong>----------------------</strong></p>
