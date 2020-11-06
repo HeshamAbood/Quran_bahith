@@ -1,1 +1,1 @@
-web: gunicorn bahith2/wsgi.py
+web: gunicorn bahith2.wsgi --log-file -
