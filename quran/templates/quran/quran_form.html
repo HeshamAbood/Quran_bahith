@@ -23,7 +23,7 @@
                         <div class="form-group">
                             <input type="text" id="search_text" class="form-control" name="f" value="{{ request.GET.f }}">
                         </div>
-                        <button type="button" id="search_data" class="btn btn-default">Search</button>
+                        <button type="button" id="search_data" class="btn btn-primary">Search</button>
                         {%  if  enter_s  %}
                             {% if s_result_count %}
                                 <span id="search_result_statistics2">
@@ -152,6 +152,7 @@
 <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
 <script>
     $("#search_data").click(function () {
+      $('#search_data').html('<span class="spinner-border spinner-border-sm mr-2" role="status" aria-hidden="true"></span>Loading...').addClass('disabled');
       var url = $("#quranForm").attr("search-result-url");  // get the url of the `load_verses` view
       var soratId = $(id_sorat).val();  // get the selected sorat ID from the HTML input
       var verseId = $(id_verse).val();
@@ -179,6 +180,7 @@
 
           $('#search_data_result').html($('#search_data_result', $holder).html());
           $('#search_result_statistics').html($('#search_result_statistics', $holder).html());
+          $('#search_data').html('<span class="spinner-border spinner-border-sm mr-2" role="status" aria-hidden="true"></span>Search').removeClass('disabled');
 
         }
       });
