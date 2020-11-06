@@ -1,1 +1,1 @@
-web: python manage.py runserver
+web: gunicorn bahith2/wsgi.py
