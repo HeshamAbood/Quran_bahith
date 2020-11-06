@@ -29,9 +29,9 @@ mccabe==0.6.1
 mkl-fft
 mkl-random
 
-numpy==1.19.1
+
 openpyxl==3.0.3
-pandas==1.1.1
+
 pefile==2019.4.18
 pycparser==2.20
 PyInstaller==3.6
